@@ -6,34 +6,9 @@
 #include "Hopfield.h"
 
 char toOutput(const short& state);
-
-void printVector(const std::vector<short>& vector)
-{
-    for (auto i : vector)
-        std::cout << i << ' ';
-    std::cout << '\n';
-}
-
-void printSet(const size_t& size, const std::vector<short>& vector)
-{
-    size_t j = 0;
-    for (auto i : vector)
-    {
-        std::cout << toOutput(i) << ' ';
-        if (!(++j % size))
-        {
-            std::cout << '\n';
-        }
-    }
-    std::cout << '\n';
-}
-
+void printSet(const size_t& size, const std::vector<short>& vector);
 std::vector<short> readSet(const char* fileName);
-
-void NN4();
-
 short getState(const char& c);
-
 
 int main(int argc, char* argv[])
 {
@@ -43,24 +18,13 @@ int main(int argc, char* argv[])
     network.train(readSet("patterns/Pattern-2.txt"));
     network.train(readSet("patterns/Pattern-3.txt"));
 
-    std::vector<short> result = network.recognise(readSet("patterns/Pattern-3_noisy_10.txt"));
+    std::vector<short> noisySet = readSet("patterns/Pattern-3_noisy_10.txt");
+    printSet(10, noisySet);
+    std::vector<short> result = network.recognise(noisySet);
     printSet(10, result);
 
     system("pause");
     return 0;
-}
-
-void NN4()
-{
-    HopfieldNetwork network(4);
-
-    network.train({ -1,1,-1,1 });
-    network.train({ 1,-1,1,1 });
-    network.train({ -1,1,-1,-1 });
-
-    std::vector<short> recognised = network.recognise({ 1,-1,1,-1 });
-
-    printVector(recognised);
 }
 
 std::vector<short> readSet(const char* fileName)
@@ -88,14 +52,14 @@ short getState(const char& c)
     short state;
     switch (c)
     {
-    case '0':
+    case '-':
         state = -1;
         break;
-    case '1':
+    case '*':
         state = 1;
         break;
     default:
-        throw new std::exception("Invalid pattern character. Only 0 and 1 are allowed.");
+        throw new std::exception("Invalid pattern character. Only - and * are allowed.");
     }
     return state;
 }
@@ -105,10 +69,24 @@ char toOutput(const short& state)
     switch (state)
     {
     case -1:
-        return '0';
+        return '-';
     case 1:
-        return '1';
+        return '*';
     default:
-        throw new std::exception("Invalid pattern character. Only 0 and 1 are allowed.");
+        throw new std::exception("Invalid state. Only -1 and 1 are allowed.");
     }
+}
+
+void printSet(const size_t& size, const std::vector<short>& vector)
+{
+    size_t j = 0;
+    for (auto i : vector)
+    {
+        std::cout << toOutput(i) << ' ';
+        if (!(++j % size))
+        {
+            std::cout << '\n';
+        }
+    }
+    std::cout << '\n';
 }
