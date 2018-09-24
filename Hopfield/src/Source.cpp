@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Hopfield.h"
+#include "Utils.h"
 
 char toOutput(const short& state);
 void printSet(const size_t& size, const std::vector<short>& vector);
@@ -14,14 +15,18 @@ int main(int argc, char* argv[])
 {
     HopfieldNetwork network(100);
 
-    network.train(readSet("patterns/Pattern-1.txt"));
+    std::vector<short> pattern1 = readSet("patterns/Pattern-1.txt");
+
+    network.train(pattern1);
     network.train(readSet("patterns/Pattern-2.txt"));
     network.train(readSet("patterns/Pattern-3.txt"));
 
-    std::vector<short> noisySet = readSet("patterns/Pattern-3_noisy_10.txt");
+    shufflePattern(pattern1);
+
+    /*std::vector<short> noisySet = readSet("patterns/Pattern-3_noisy_10.txt");
     printSet(10, noisySet);
     std::vector<short> result = network.recognise(noisySet);
-    printSet(10, result);
+    printSet(10, result);*/
 
     system("pause");
     return 0;
