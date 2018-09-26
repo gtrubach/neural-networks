@@ -2,5 +2,4 @@
 
 #include <vector>
 
-std::vector<short> shufflePattern(const std::vector<short>& pattern, size_t shufflePercent);
-
+std::vector<short> generateNoisyPattern(const std::vector<short>& pattern, size_t shufflePercent);
