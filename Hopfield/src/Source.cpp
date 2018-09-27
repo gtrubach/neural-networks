@@ -21,12 +21,10 @@ int main(int argc, char* argv[])
     network.train(readSet("patterns/Pattern-2.txt"));
     network.train(readSet("patterns/Pattern-3.txt"));
 
-    generateNoisyPattern(pattern1, 10);
-
-    /*std::vector<short> noisySet = readSet("patterns/Pattern-3_noisy_10.txt");
-    printSet(10, noisySet);
-    std::vector<short> result = network.recognise(noisySet);
-    printSet(10, result);*/
+    auto noisy1 = generateNoisyPattern(pattern1, 10);
+    printSet(10, pattern1);
+    printSet(10, noisy1);
+    printSet(10, network.recognise(noisy1));
 
     system("pause");
     return 0;
