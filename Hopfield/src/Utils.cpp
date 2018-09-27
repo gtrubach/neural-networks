@@ -22,7 +22,9 @@ std::vector<size_t> generateShuffledSequence(const size_t &patternSize)
     {
         idxs[i] = i;
     }
-    auto rng = std::default_random_engine();
+    std::random_device rd;
+    std::mt19937 mt(rd());
+    static auto rng = std::default_random_engine(mt);
     std::shuffle(idxs.begin(), idxs.end(), rng);
     return idxs;
 }

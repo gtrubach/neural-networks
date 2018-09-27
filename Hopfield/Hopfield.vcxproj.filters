@@ -35,9 +35,6 @@
     <Text Include="patterns\Pattern-3.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="patterns\Pattern-3_noisy_10.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Hopfield.h">

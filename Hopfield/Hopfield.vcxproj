@@ -131,7 +131,6 @@
     <Text Include="patterns\Pattern-1.txt" />
     <Text Include="patterns\Pattern-2.txt" />
     <Text Include="patterns\Pattern-3.txt" />
-    <Text Include="patterns\Pattern-3_noisy_10.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
