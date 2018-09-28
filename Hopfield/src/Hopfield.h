@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include "Generator.h"
 
 class HopfieldNetwork
 {
@@ -9,11 +10,16 @@ private:
 
     size_t neuronsCount;
     matrix weights;
+    Generator generator;
+
     short sign(const int& x) const;
-    bool compareVectors(const std::vector<short>& v1, const std::vector<short>& v2) const;
+    int multiplyVectors(const std::vector<short>& first, const std::vector<short>& second) const;
+    bool compareVectors(const std::vector<short>& first, const std::vector<short>& second) const;
+    void validateSet(const std::vector<short>& set) const;
 public:
     HopfieldNetwork(size_t neuronsCount);
 
     void train(const std::vector<short>& trainingSet);
-    std::vector<short> recognise(const std::vector<short>& set) const;
+    std::vector<short> recogniseSync(const std::vector<short>& set) const;
+    std::vector<short> recogniseAsync(const std::vector<short>& set) const;
 };

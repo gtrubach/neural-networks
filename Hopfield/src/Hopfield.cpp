@@ -4,19 +4,29 @@ using vector = std::vector<short>;
 
 short HopfieldNetwork::sign(const int& x) const
 {
-    return x > 0 ? 1 : -1;
+    return x >= 0 ? 1 : -1;
 }
 
-bool HopfieldNetwork::compareVectors(const vector & v1, const vector & v2) const
+int HopfieldNetwork::multiplyVectors(const vector& first, const vector& second) const
 {
-    size_t size = v1.size();
-    if (size != v2.size())
+    int result = 0;
+    for (size_t i = 0; i < neuronsCount; i++)
+    {
+        result += first[i] * second[i];
+    }
+    return result;
+}
+
+bool HopfieldNetwork::compareVectors(const vector& first, const vector& second) const
+{
+    size_t size = first.size();
+    if (size != second.size())
     {
         return false;
     }
     for (size_t i = 0; i < size; i++)
     {
-        if (v1[i] != v2[i])
+        if (first[i] != second[i])
         {
             return false;
         }
@@ -24,9 +34,17 @@ bool HopfieldNetwork::compareVectors(const vector & v1, const vector & v2) const
     return true;
 }
 
+void HopfieldNetwork::validateSet(const std::vector<short>& set) const
+{
+    if (neuronsCount != set.size())
+    {
+        throw new std::exception("Neurons count and set count does not match.");
+    }
+}
+
 HopfieldNetwork::HopfieldNetwork(size_t neuronsCount) :
     neuronsCount(neuronsCount),
-    weights(matrix(neuronsCount, vector(neuronsCount)))
+    weights(matrix(neuronsCount, vector(neuronsCount, 0)))
 {
 }
 
@@ -46,25 +64,36 @@ void HopfieldNetwork::train(const vector& trainingSet)
     }
 }
 
-vector HopfieldNetwork::recognise(const vector& set) const
+vector HopfieldNetwork::recogniseSync(const vector& set) const
 {
-    if (neuronsCount != set.size())
-    {
-        throw new std::exception("Neurons count and set count does not match.");
-    }
+    validateSet(set);
     bool stabilized = false;
-    vector calculatedNeurons(neuronsCount, 0);
+    vector calculatedNeurons = set;
     vector previousNeurons = set;
     while (!stabilized)
     {
         for (size_t i = 0; i < neuronsCount; i++)
         {
-            int result = 0;
-            for (size_t j = 0; j < neuronsCount; j++)
-            {
-                result += weights[i][j] * previousNeurons[j];
-            }
-            calculatedNeurons[i] = sign(result);
+            calculatedNeurons[i] = sign(multiplyVectors(weights[i], previousNeurons));
+        }
+        stabilized = compareVectors(previousNeurons, calculatedNeurons);
+        previousNeurons = calculatedNeurons;
+    }
+    return calculatedNeurons;
+}
+
+vector HopfieldNetwork::recogniseAsync(const vector& set) const
+{
+    validateSet(set);
+    bool stabilized = false;
+    vector calculatedNeurons = set;
+    vector previousNeurons = set;
+    while (!stabilized)
+    {
+        auto idxs = generator.generateShuffledSequence(neuronsCount);
+        for (auto i : idxs)
+        {
+            calculatedNeurons[i] = sign(multiplyVectors(weights[i], calculatedNeurons));
         }
         stabilized = compareVectors(previousNeurons, calculatedNeurons);
         previousNeurons = calculatedNeurons;
