@@ -119,12 +119,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Arguments.cpp" />
+    <ClCompile Include="src\CommandParser.cpp" />
     <ClCompile Include="src\Generator.cpp" />
     <ClCompile Include="src\Hopfield.cpp" />
     <ClCompile Include="src\Source.cpp" />
     <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Arguments.h" />
+    <ClInclude Include="src\CommandParser.h" />
     <ClInclude Include="src\Generator.h" />
     <ClInclude Include="src\Hopfield.h" />
     <ClInclude Include="src\Utils.h" />

@@ -1,4 +1,5 @@
 #include <fstream>
+#include <regex>
 #include "Generator.h"
 #include "Utils.h"
 
@@ -13,7 +14,7 @@ void Utils::negate(std::vector<short>& collection, unsignedVectorIt firstIndex, 
     }
 }
 
-short Utils::getNeuronState(const char & c)
+short Utils::getNeuronState(const char& c)
 {
     short state;
     switch (c)
@@ -30,7 +31,7 @@ short Utils::getNeuronState(const char & c)
     return state;
 }
 
-char Utils::getNeuronChar(const short & state)
+char Utils::getNeuronChar(const short& state)
 {
     switch (state)
     {
@@ -53,7 +54,7 @@ std::vector<short> Utils::generateNoisyPattern(const std::vector<short>& pattern
     return inverted;
 }
 
-std::vector<short> Utils::readSet(const char * fileName)
+std::vector<short> Utils::readSet(const std::string& fileName)
 {
     std::ifstream infile(fileName);
     if (!infile)
@@ -84,5 +85,9 @@ void Utils::writeSet(std::ostream & out, const size_t& size, const std::vector<s
             out << '\n';
         }
     }
-    out << '\n';
+}
+
+std::string StringUtils::format(std::string format, size_t arg)
+{
+    return std::regex_replace(format, std::regex("\\{0\\}"), std::to_string(arg));
 }

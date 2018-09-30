@@ -7,6 +7,7 @@ class HopfieldNetwork
 {
 private:
     using matrix = std::vector<std::vector<short>>;
+    static constexpr size_t MAX_ITERATION = 1000;
 
     size_t neuronsCount;
     matrix weights;

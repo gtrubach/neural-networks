@@ -68,9 +68,10 @@ vector HopfieldNetwork::recogniseSync(const vector& set) const
 {
     validateSet(set);
     bool stabilized = false;
+    size_t iteration = 0;
     vector calculatedNeurons = set;
     vector previousNeurons = set;
-    while (!stabilized)
+    while (!stabilized && iteration++ <= MAX_ITERATION)
     {
         for (size_t i = 0; i < neuronsCount; i++)
         {
