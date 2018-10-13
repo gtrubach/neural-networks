@@ -87,6 +87,21 @@ void Utils::writeSet(std::ostream & out, const size_t& size, const std::vector<s
     }
 }
 
+size_t Utils::equalityPercent(const std::vector<short>& v1, const std::vector<short>& v2)
+{
+    size_t size = v1.size();
+    if(size!=v2.size())
+    {
+        return 0;
+    }
+    size_t equal = 0;
+    for (size_t i = 0; i < size; i++)
+    {
+        equal += v1[i] == v2[i];
+    }
+    return (size_t)(equal * 100 / size);
+}
+
 std::string StringUtils::format(std::string format, size_t arg)
 {
     return std::regex_replace(format, std::regex("\\{0\\}"), std::to_string(arg));

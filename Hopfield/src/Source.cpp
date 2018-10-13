@@ -49,9 +49,13 @@ int main(int argc, char* argv[])
                 out << "Pattern with " << noisePercent << "% noise\n";
                 Utils::writeSet(out, args.patternSize, noisy);
                 out << "Synchronous recognition result\n";
-                Utils::writeSet(out, args.patternSize, network.recogniseSync(noisy));
+                auto recognized = network.recogniseSync(noisy);
+                Utils::writeSet(out, args.patternSize, recognized);
+                out << "Equality percent: " << Utils::equalityPercent(pattern, recognized) << "%\n";
                 out << "Asynchronous recognition result\n";
-                Utils::writeSet(out, args.patternSize, network.recogniseAsync(noisy));
+                recognized = network.recogniseAsync(noisy);
+                Utils::writeSet(out, args.patternSize, recognized);
+                out << "Equality percent: " << Utils::equalityPercent(pattern, recognized) << "%\n";
             }
         }
         out.close();
