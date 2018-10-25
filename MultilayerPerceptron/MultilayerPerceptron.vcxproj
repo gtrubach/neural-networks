@@ -19,13 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MultilayerPerceptron.h" />
-    <ClInclude Include="NeuronLayer.h" />
+    <ClInclude Include="Layer.h" />
+    <ClInclude Include="MLP.h" />
+    <ClInclude Include="MLPInfo.h" />
+    <ClInclude Include="Synapse.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MultilayerPerceptron.cpp" />
-    <ClCompile Include="NeuronLayer.cpp" />
+    <ClCompile Include="Layer.cpp" />
+    <ClCompile Include="MLP.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="Synapse.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
