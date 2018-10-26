@@ -3,6 +3,7 @@
 
 
 Synapse::Synapse()
+    : firstLayer(LayerType::Inner, 10), secondLayer(LayerType::Output, 1)
 {
 }
 

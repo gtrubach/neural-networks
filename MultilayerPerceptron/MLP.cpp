@@ -21,6 +21,6 @@ MLP::MLP(const MLPInfo& info)
 }
 
 
-MLP::~MLP()
-{
-}
+//MLP::~MLP()
+//{
+//}

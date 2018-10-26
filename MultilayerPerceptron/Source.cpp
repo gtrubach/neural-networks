@@ -1,4 +1,4 @@
-#include <cmath>
+﻿#include <cmath>
 #include <vector>
 #include <iostream>
 
@@ -17,7 +17,7 @@ double sigmoidDerivative(double value)
     return value * (1 - value);
 }
 
-vect generateRandom(size_t size)
+vect createRandomVector(size_t size)
 {
     vect res(size);
     for (size_t i = 0; i < size; i++)
@@ -56,113 +56,168 @@ void DrawImage(vect &in)
     }
 }
 
+matr createRandomMatrix(const size_t &n, const size_t &h);
+
 int main()
 {
     size_t n = 36, h = 6, m = 5;
-    vect in =
+    matr inputs =
     {
-        1.0,1.0,1.0,1.0,1.0,1.0,
-        0.0,0.0,0.0,0.0,1.0,1.0,
-        1.0,1.0,1.0,1.0,1.0,1.0,
-        1.0,1.0,1.0,1.0,1.0,1.0,
-        0.0,0.0,0.0,0.0,1.0,1.0,
-        1.0,1.0,1.0,1.0,1.0,1.0
+        // ^
+        {
+            0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
+            0.0, 1.0, 0.0, 1.0, 0.0, 0.0,
+            0.0, 1.0, 0.0, 1.0, 0.0, 0.0,
+            1.0, 0.0, 0.0, 0.0, 1.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+        },
+        // ˅
+        {
+            1.0, 0.0, 0.0, 0.0, 1.0, 0.0,
+            0.0, 1.0, 0.0, 1.0, 0.0, 0.0,
+            0.0, 1.0, 0.0, 1.0, 0.0, 0.0,
+            0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+        },
+        // ꓱ
+        {
+            1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+            1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+            1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+        },
+        // ⊃
+        {
+            1.0, 1.0, 1.0, 1.0, 1.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+            1.0, 1.0, 1.0, 1.0, 1.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+        },
+        // ⊂
+        {
+            0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+            1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+        }
     };
-    DrawImage(in);
+    size_t inputsCount = inputs.size();
+
     vect hid(h);
     vect out(m);
-    vect outReal = { 0.0,0.0,1.0,0.0,0.0 };
+    matr outputs =
+    {
+        { 1.0, 0.0, 0.0, 0.0, 0.0 },
+        { 0.0, 1.0, 0.0, 0.0, 0.0 },
+        { 0.0, 0.0, 1.0, 0.0, 0.0 },
+        { 0.0, 0.0, 0.0, 1.0, 0.0 },
+        { 0.0, 0.0, 0.0, 0.0, 1.0 }
+    };
 
-    vect Q(generateRandom(h));
-    vect T(generateRandom(m));
+    vect Q = createRandomVector(h);
+    vect T = createRandomVector(m);
 
     double alpha, beta;
     alpha = beta = 1;
 
-    matr wIH(n, vect(h));
-    for (size_t i = 0; i < n; i++)
-    {
-        wIH[i] = generateRandom(h);
-    }
-    matr wHO(h, vect(m));
-    for (size_t i = 0; i < h; i++)
-    {
-        wHO[i] = generateRandom(m);
-    }
+    matr wIH = createRandomMatrix(n, h);
+    matr wHO = createRandomMatrix(h, m);
 
     vect ferr(m);
 
-    do
+
+    for (size_t idx = 0; idx < inputsCount; idx++)
     {
-        for (size_t i = 0; i < h; i++)
+        vect in = inputs[idx];
+        vect outReal = outputs[idx];
+        DrawImage(in);
+        cout << "======\n";
+        do
         {
-            double tmp = 0.0;
-            for (size_t j = 0; j < n; j++)
+            for (size_t i = 0; i < h; i++)
             {
-                tmp += wIH[j][i] * in[j];
+                double tmp = 0.0;
+                for (size_t j = 0; j < n; j++)
+                {
+                    tmp += wIH[j][i] * in[j];
+                }
+                hid[i] = activate(tmp + Q[i]);
             }
-            hid[i] = activate(tmp + Q[i]);
-        }
 
-        for (size_t k = 0; k < m; k++)
-        {
-            double tmp = 0.0;
-            for (size_t j = 0; j < h; j++)
-            {
-                tmp += wHO[j][k] * hid[j];
-            }
-            out[k] = activate(tmp + T[k]);
-        }
-
-        vect err(m);
-        vect out_delta(m);
-
-        for (size_t k = 0; k < m; k++)
-        {
-            err[k] = outReal[k] - out[k];
-            ferr[k] = fabs(err[k]);
-            out_delta[k] = err[k] * sigmoidDerivative(out[k]);
-        }
-
-        vect hid_err(h);
-        vect hid_delta(h);
-
-        for (size_t j = 0; j < h; j++)
-        {
             for (size_t k = 0; k < m; k++)
             {
-                hid_err[j] += out_delta[k] * wHO[j][k];
+                double tmp = 0.0;
+                for (size_t j = 0; j < h; j++)
+                {
+                    tmp += wHO[j][k] * hid[j];
+                }
+                out[k] = activate(tmp + T[k]);
             }
-            hid_delta[j] = hid_err[j] * sigmoidDerivative(hid[j]);
-        }
 
-        for (size_t k = 0; k < m; k++)
-        {
+            vect err(m);
+            vect out_delta(m);
+
+            for (size_t k = 0; k < m; k++)
+            {
+                err[k] = outReal[k] - out[k];
+                ferr[k] = fabs(err[k]);
+                out_delta[k] = err[k] * sigmoidDerivative(out[k]);
+            }
+
+            vect hid_err(h);
+            vect hid_delta(h);
+
             for (size_t j = 0; j < h; j++)
             {
-                wHO[j][k] += alpha * out_delta[k] * hid[j];
+                for (size_t k = 0; k < m; k++)
+                {
+                    hid_err[j] += out_delta[k] * wHO[j][k];
+                }
+                hid_delta[j] = hid_err[j] * sigmoidDerivative(hid[j]);
             }
-            T[k] += alpha * out_delta[k];
-        }
 
-        for (size_t j = 0; j < h; j++)
-        {
-            for (size_t i = 0; i < n; i++)
+            for (size_t k = 0; k < m; k++)
             {
-                wIH[i][j] += beta * hid_delta[j] * in[i];
+                for (size_t j = 0; j < h; j++)
+                {
+                    wHO[j][k] += alpha * out_delta[k] * hid[j];
+                }
+                T[k] += alpha * out_delta[k];
             }
-            Q[j] += beta * hid_delta[j];
-        }
-    } while (max(ferr) > 0.01);
+
+            for (size_t j = 0; j < h; j++)
+            {
+                for (size_t i = 0; i < n; i++)
+                {
+                    wIH[i][j] += beta * hid_delta[j] * in[i];
+                }
+                Q[j] += beta * hid_delta[j];
+            }
+        } while (max(ferr) > 0.01);
+    }
 
     vect in_noised =
     {
-        0.0,0.0,0.0,0.0,1.0,1.0,
+        /*0.0,0.0,0.0,0.0,1.0,1.0,
         1.0,1.0,1.0,1.0,1.0,1.0,
         1.0,1.0,1.0,1.0,1.0,1.0,
         1.0,1.0,1.0,1.0,1.0,1.0,
         1.0,1.0,0.0,0.0,0.0,0.0,
-        1.0,1.0,1.0,1.0,1.0,1.0
+        1.0,1.0,1.0,1.0,1.0,1.0*/
+        1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+            1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+            1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0
     };
 
     DrawImage(in_noised);
@@ -194,4 +249,14 @@ int main()
     }
 
     return 0;
+}
+
+matr createRandomMatrix(const size_t &n, const size_t &k)
+{
+    matr m(n, vect(k));
+    for (size_t i = 0; i < n; i++)
+    {
+        m[i] = createRandomVector(k);
+    }
+    return m;
 }
