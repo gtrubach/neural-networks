@@ -2,8 +2,8 @@
 
 using vector = std::vector<double>;
 
-Layer::Layer(const LayerType& type, const size_t& size)
-    : type(type), size(size), neurons(size)
+Layer::Layer(const LayerType& type, const size_t& size, Layer* previousLayer)
+    : type(type), size(size), neurons(size), previous(previousLayer)
 {
     if (size <= 0)
     {
@@ -31,6 +31,4 @@ LayerType Layer::getType() const
 void Layer::prepare(const size_t &synapsesCount)
 {
     weights.reserve(synapsesCount);
-
-
 }

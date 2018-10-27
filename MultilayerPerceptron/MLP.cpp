@@ -23,19 +23,23 @@ MLP::MLP(std::vector<size_t> layerSizes)
     this->layersCount = layersCount;
     layers.reserve(layersCount);
     size_t layerIndex = 0;
-    layers.push_back(Layer(LayerType::Inner, layerSizes[layerIndex]));
+    layers.push_back(Layer(LayerType::Inner, layerSizes[layerIndex], nullptr));
     while (++layerIndex < layersCount - 1)
     {
-        layers.push_back(Layer(LayerType::Hidden, layerSizes[layerIndex]));
+        layers.push_back(Layer(LayerType::Hidden, layerSizes[layerIndex], &layers[layerIndex - 1]));
     }
-    layers.push_back(Layer(LayerType::Output, layerSizes[layerIndex]));
+    layers.push_back(Layer(LayerType::Output, layerSizes[layerIndex], &layers[layerIndex - 1]));
 }
 
 
 void MLP::train(const std::vector<TrainingSample>& trainingSet, TrainConfig config)
 {
-    //layers[0].neurons = 
     size_t count = trainingSet.size();
+    for (size_t i = 0; i < count; i++)
+    {
+        auto sample = trainingSet[i];
+        layers[0].neurons = sample.input;
+    }
 }
 
 void MLP::recognise(const std::vector<double>& input) const

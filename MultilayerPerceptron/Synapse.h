@@ -8,8 +8,8 @@ class Synapse
 private:
     using Matrix = std::vector<std::vector<double>>;
 
-    Layer firstLayer;
-    Layer secondLayer;
+    //Layer firstLayer;
+    //Layer secondLayer;
     Matrix weights;
 public:
     Synapse();
