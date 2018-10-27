@@ -1,6 +1,7 @@
 ﻿#include <cmath>
 #include <vector>
 #include <iostream>
+#include <ctime>
 
 using namespace std;
 
@@ -14,7 +15,7 @@ double activate(double value)
 
 double sigmoidDerivative(double value)
 {
-    return value * (1 - value);
+    return value * (1.0 - value);
 }
 
 vect createRandomVector(size_t size)
@@ -44,6 +45,21 @@ double max(vect arr)
     return tmp;
 }
 
+double maxAbs(matr m)
+{
+    double tmp = fabs(m[0][0]);
+
+    for (auto row : m)
+    {
+        for (auto el : row)
+        {
+            double elAbs = fabs(el);
+            if (elAbs > tmp) tmp = elAbs;
+        }
+    }
+
+    return tmp;
+}
 
 void DrawImage(vect &in)
 {
@@ -60,7 +76,7 @@ matr createRandomMatrix(const size_t &n, const size_t &h);
 
 int main()
 {
-    size_t n = 36, h = 6, m = 5;
+    size_t n = 36, h = 6, m = 5, p = 5;
     matr inputs =
     {
         // ^
@@ -109,10 +125,9 @@ int main()
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0
         }
     };
-    size_t inputsCount = inputs.size();
 
     vect hid(h);
-    vect out(m);
+    matr outputsTrained(m, vect(m));
     matr outputs =
     {
         { 1.0, 0.0, 0.0, 0.0, 0.0 },
@@ -126,30 +141,51 @@ int main()
     vect T = createRandomVector(m);
 
     double alpha, beta;
-    alpha = beta = 1;
-
+    alpha = beta = 1.0;
     matr wIH = createRandomMatrix(n, h);
-    matr wHO = createRandomMatrix(h, m);
-
-    vect ferr(m);
-
-
-    for (size_t idx = 0; idx < inputsCount; idx++)
+    /*for (size_t i = 0; i < n; i++)
     {
-        vect in = inputs[idx];
-        vect outReal = outputs[idx];
-        DrawImage(in);
-        cout << "======\n";
-        do
+        for (size_t j = 0; j < h; j++)
         {
-            for (size_t i = 0; i < h; i++)
+            cout << wIH[i][j] << ", ";
+        }
+        cout << '\n';
+    }
+    cout << '\n';*/
+    matr wHO = createRandomMatrix(h, m);
+    /*for (size_t i = 0; i < h; i++)
+    {
+        for (size_t j = 0; j < m; j++)
+        {
+            cout << wHO[i][j] << ", ";
+        }
+        cout << '\n';
+    }*/
+    matr ferr(p, vect(m));
+
+    std::clock_t start;
+    double duration;
+
+    start = std::clock();
+
+    size_t iter = 0;
+    do
+    {
+        for (size_t idx = 0; idx < p; idx++)
+        {
+            vect in = inputs[idx];
+            vect out = outputsTrained[idx];
+            vect outReal = outputs[idx];
+            //DrawImage(in);
+            //cout << "======\n";
+            for (size_t j = 0; j < h; j++)
             {
                 double tmp = 0.0;
-                for (size_t j = 0; j < n; j++)
+                for (size_t i = 0; i < n; i++)
                 {
-                    tmp += wIH[j][i] * in[j];
+                    tmp += wIH[i][j] * in[i];
                 }
-                hid[i] = activate(tmp + Q[i]);
+                hid[j] = activate(tmp + Q[j]);
             }
 
             for (size_t k = 0; k < m; k++)
@@ -168,7 +204,7 @@ int main()
             for (size_t k = 0; k < m; k++)
             {
                 err[k] = outReal[k] - out[k];
-                ferr[k] = fabs(err[k]);
+                ferr[idx][k] = err[k];
                 out_delta[k] = err[k] * sigmoidDerivative(out[k]);
             }
 
@@ -201,51 +237,66 @@ int main()
                 }
                 Q[j] += beta * hid_delta[j];
             }
-        } while (max(ferr) > 0.01);
-    }
-
-    vect in_noised =
-    {
-        /*0.0,0.0,0.0,0.0,1.0,1.0,
-        1.0,1.0,1.0,1.0,1.0,1.0,
-        1.0,1.0,1.0,1.0,1.0,1.0,
-        1.0,1.0,1.0,1.0,1.0,1.0,
-        1.0,1.0,0.0,0.0,0.0,0.0,
-        1.0,1.0,1.0,1.0,1.0,1.0*/
-        1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
-            1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
-            1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-    };
-
-    DrawImage(in_noised);
-    vect out_rec(m);
-
-    for (size_t i = 0; i < h; i++)
-    {
-        double tmp = 0.0;
-        for (size_t j = 0; j < n; j++)
-        {
-            tmp += wIH[j][i] * in_noised[j];
+            outputsTrained[idx] = out;
         }
-        hid[i] = activate(tmp + Q[i]);
-    }
+        iter++;
+    } while (maxAbs(ferr) >= 0.01);
 
-    for (size_t k = 0; k < m; k++)
+    duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+    std::cout << "=============\n";
+    std::cout << "Train stats:\n";
+    for (size_t i = 0; i < p; i++)
     {
-        double tmp = 0.0;
-        for (size_t j = 0; j < h; j++)
+        DrawImage(inputs[i]);
+        for (size_t k = 0; k < m; k++)
         {
-            tmp += wHO[j][k] * hid[j];
+            cout << "Class " << k + 1 << " : " << outputsTrained[i][k] * 100 << " %\n";
         }
-        out_rec[k] = activate(tmp + T[k]);
     }
+    std::cout << "Iterations:" << iter << '\n';
+    std::cout << "Elapsed: " << duration << " sec.\n";
+    std::cout << "=============\n";
 
-    for (size_t k = 0; k < m; k++)
+    matr ins_noised(inputs);
+    ins_noised.push_back(
+        {
+            0.0,0.0,0.0,0.0,1.0,1.0,
+            1.0,1.0,1.0,1.0,1.0,1.0,
+            1.0,1.0,1.0,1.0,1.0,1.0,
+            1.0,1.0,1.0,1.0,1.0,1.0,
+            1.0,1.0,0.0,0.0,0.0,0.0,
+            1.0,1.0,1.0,1.0,1.0,1.0
+        });
+    
+    for (auto in_noised : ins_noised)
     {
-        cout << "Class " << k + 1 << " : " << out_rec[k] * 100 << " %\n";
+        DrawImage(in_noised);
+        vect out_rec(m);
+
+        for (size_t i = 0; i < h; i++)
+        {
+            double tmp = 0.0;
+            for (size_t j = 0; j < n; j++)
+            {
+                tmp += wIH[j][i] * in_noised[j];
+            }
+            hid[i] = activate(tmp + Q[i]);
+        }
+
+        for (size_t k = 0; k < m; k++)
+        {
+            double tmp = 0.0;
+            for (size_t j = 0; j < h; j++)
+            {
+                tmp += wHO[j][k] * hid[j];
+            }
+            out_rec[k] = activate(tmp + T[k]);
+        }
+
+        for (size_t k = 0; k < m; k++)
+        {
+            cout << "Class " << k + 1 << " : " << out_rec[k] * 100 << " %\n";
+        }
     }
 
     return 0;
