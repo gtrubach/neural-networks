@@ -27,6 +27,12 @@
     <ClInclude Include="MLPInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TrainingSample.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TrainConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">

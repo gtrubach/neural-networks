@@ -3,13 +3,15 @@
 using vector = std::vector<double>;
 
 Layer::Layer(const LayerType& type, const size_t& size)
-    : type(type), size(size), neurons(size), thresholds(size)
+    : type(type), size(size), neurons(size)
 {
     if (size <= 0)
     {
         throw new std::invalid_argument("Size must be greater that 0.");
     }
+    thresholds.reserve(size);
 }
+
 
 std::vector<double> Layer::getNeurons() const
 {
@@ -24,4 +26,11 @@ size_t Layer::getSize() const
 LayerType Layer::getType() const
 {
     return type;
+}
+
+void Layer::prepare(const size_t &synapsesCount)
+{
+    weights.reserve(synapsesCount);
+
+
 }

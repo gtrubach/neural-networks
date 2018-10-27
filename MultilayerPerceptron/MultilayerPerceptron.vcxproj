@@ -23,6 +23,8 @@
     <ClInclude Include="MLP.h" />
     <ClInclude Include="MLPInfo.h" />
     <ClInclude Include="Synapse.h" />
+    <ClInclude Include="TrainConfig.h" />
+    <ClInclude Include="TrainingSample.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Layer.cpp" />

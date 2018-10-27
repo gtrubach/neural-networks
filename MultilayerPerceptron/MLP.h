@@ -1,18 +1,21 @@
 #pragma once
 
-#include "Synapse.h"
-#include "MLPInfo.h"
+#include "Layer.h"
+#include "TrainConfig.h"
+#include "TrainingSample.h"
 #include <vector>
 
 class MLP
 {
 private:
-    std::vector<Synapse> synapses;
+    std::vector<Layer> layers;
+    size_t layersCount;
 
-    double activate(const double& value) const;
+    double sigmoid(const double& value) const;
+    double sigmoidDerivative(const double& value) const;
 public:
-    MLP(const MLPInfo& info);
+    MLP(std::vector<size_t> layerSizes);
 
-    void train();
-    void recognise();
+    void train(const std::vector<TrainingSample>& trainingSet, TrainConfig config);
+    void recognise(const std::vector<double>& input) const;
 };
