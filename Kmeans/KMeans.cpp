@@ -1,6 +1,23 @@
 #include "KMeans.h"
+#include <chrono>
 
-double KMeans::distance(const Point& first, const Point& second)
+
+unsigned int KMeans::getRngSeed() const
+{
+    return (unsigned int)std::chrono::high_resolution_clock::now()
+        .time_since_epoch()
+        .count();
+}
+
+void KMeans::free(KMeans::Matrix::iterator begin, KMeans::Matrix::iterator end, double value)
+{
+    for (auto it = begin; it != end; ++it)
+    {
+        std::fill(it->begin(), it->end(), value);
+    }
+}
+
+double KMeans::calculateDistance(const Vector& first, const Vector& second)
 {
     double dist = 0.0;
     auto firstIt = first.begin();
@@ -13,79 +30,109 @@ double KMeans::distance(const Point& first, const Point& second)
     return sqrt(dist);
 }
 
-size_t KMeans::indexOfMinimum(const Point& data)
+size_t KMeans::chooseCluster(const Matrix& centroids, const Vector& point)
 {
-    auto minIdx = data.begin();
-    double minElement = *minIdx;
-    for (auto it = data.begin(); it != data.end(); it++)
+    auto minIt = centroids.begin();
+    double minDistance = std::numeric_limits<double>::max();
+    for (auto it = centroids.begin(); it != centroids.end(); ++it)
     {
-        double element = *it;
-        if (element < minElement)
+        Vector centroid = *it;
+        double distance = calculateDistance(point, centroid);
+        if (distance < minDistance)
         {
-            minElement = element;
-            minIdx = it;
+            minDistance = distance;
+            minIt = it;
         }
     }
-    return minIdx - data.begin();
+    return minIt - centroids.begin();
 }
 
-Center KMeans::calculateCenter(const Cluster& cluster, const size_t& dataSize)
+KMeans::Matrix KMeans::initCentroids(const Matrix& dataset)
 {
-    Center center(dataSize);
-    for(double coordinate: center)
+    Matrix sample = dataset;
+    size_t datasetSize = dataset.size();
+    auto begin = sample.begin();
+    for (size_t i = 0; i < clustersCount; i++)
     {
-        for (auto point : cluster)
-        {
-            coordinate += point[i];
-        }
-        coordinate /= clustersCount;
+        auto it = begin + rng() % datasetSize - i;
+        std::swap(*begin, *it);
+        begin++;
     }
-    return center;
+    return Matrix(begin, begin + clustersCount);
 }
 
+KMeans::ComputeResult KMeans::compute(const Matrix& dataset, const size_t& setSize, const size_t& pointSize)
+{
+    size_t iteration = 0;
+    bool converges = false;
+    std::vector<size_t> clustersLabels(setSize);
+    std::vector<size_t> clustersSizes(clustersCount);
+
+    Matrix centroids = initCentroids(dataset);
+    Matrix newCentroids(clustersCount, Vector(pointSize));
+    while (!converges && iteration < maxIterations)
+    {
+        std::fill(clustersSizes.begin(), clustersSizes.end(), 0);
+        free(newCentroids.begin(), newCentroids.end(), 0);
+        for (size_t i = 0; i < setSize; i++)
+        {
+            const Vector& point = dataset[i];
+            size_t clusterNumber = chooseCluster(centroids, point);
+
+            clustersLabels[i] = clusterNumber;
+            ++clustersSizes[clusterNumber];
+
+            Vector& newCentroid = newCentroids[clusterNumber];
+            for (size_t j = 0; j < pointSize; j++)
+            {
+                newCentroid[j] += point[j];
+            }
+        }
+        converges = true;
+        for (size_t i = 0; i < clustersCount; i++)
+        {
+            Vector& newCentroid = newCentroids[i];
+            Vector& currentCentroid = centroids[i];
+            size_t clusterSize = clustersSizes[i];
+            for (size_t j = 0; j < pointSize; j++)
+            {
+                double coordinate = newCentroid[j] /= clusterSize;
+                if (coordinate != currentCentroid[j])
+                {
+                    converges = false;
+                };
+                currentCentroid[j] = coordinate;
+            }
+        }
+        ++iteration;
+    }
+    return ComputeResult(clustersLabels, centroids);
+}
 
 KMeans::KMeans(const size_t& k, const size_t& maxIterations)
-    : clustersCount(k), maxIterations(maxIterations)
+    : clustersCount(k), maxIterations(maxIterations), rng(getRngSeed())
 {
 }
 
-void KMeans::compute(const Dataset& dataset)
+KMeans::ComputeResult KMeans::compute(const std::vector<std::vector<double>>& dataset)
 {
-    if (dataset.getSetSize() < clustersCount)
+    size_t setSize = dataset.size();
+    if (dataset.size() < clustersCount)
     {
         throw new std::invalid_argument("Set size should be not less than number of clusters.");
     }
-
-    size_t dataSize = dataset.getDataSize();
-    size_t iteration = 0;
-    bool converges = false;
-
-    std::vector<std::vector<std::vector<double>>> clusters;
-
-    //auto seed = (unsigned int)std::chrono::high_resolution_clock::now().time_since_epoch().count();
-    //std::default_random_engine rng(seed);
-    std::vector<std::vector<double>> centers /*= sample(ds, k,)*/;
-
-    while (!converges && iteration < maxIterations)
+    size_t dataSize = dataset.begin()->size();
+    for (const Vector& data : dataset)
     {
-        clusters = std::vector<std::vector<std::vector<double>>>(clustersCount);
-        for (auto point : dataset)
+        if (dataSize != data.size())
         {
-            std::vector<double> distances;
-            distances.reserve(clustersCount);
-            for (auto center : centers)
-            {
-                distances.push_back(distance(point, center));
-            }
-            size_t clusterNumber = indexOfMinimum(distances);
-            clusters[clusterNumber].push_back(point);
+            throw new std::invalid_argument("Data length in set must be the same.");
         }
-        for (size_t i = 0; i < clustersCount; i++)
-        {
-            std::vector<double> newCenter = calculateCenter(clusters[i], dataSize);
-            converges = newCenter == centers[i];
-            centers[i] = newCenter;
-        }
-        iteration++;
     }
+    return compute(dataset, setSize, dataSize);
+}
+
+KMeans::ComputeResult::ComputeResult(const std::vector<size_t>& labels, const std::vector<std::vector<double>>& centroids)
+    : labels(labels), centroids(centroids)
+{
 }

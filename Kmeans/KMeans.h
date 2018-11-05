@@ -1,27 +1,37 @@
 #pragma once
 
 #include <vector>
-#include "Dataset.h"
-
-//using Center = std::vector<double>;
-//using Centers = std::vector<Center>;
-//using Cluster = std::vector<Point>;
-//using Clusters = std::vector<Cluster>;
+#include <random>
 
 class KMeans
 {
+public:
+    struct ComputeResult
+    {
+        std::vector<size_t> labels;
+        std::vector<std::vector<double>> centroids;
+
+        ComputeResult(const std::vector<size_t>& labels, const std::vector<std::vector<double>>& centroids);
+    };
 private:
-    using Point = Dataset::Data;
-    using doubleVector = std::vector<double>;
-    using doubleMatrix = std::vector<doubleVector>;
+    using Vector = std::vector<double>;
+    using Matrix = std::vector<Vector>;
+
+    struct ComputeResult;
 
     size_t clustersCount;
     size_t maxIterations;
 
-    double distance(const Point& first, const Point& second);
-    size_t indexOfMinimum(const Point& data);
-    Center calculateCenter(const Cluster& cluster, const size_t& dataSize);
+    std::mt19937 rng;
+    unsigned int getRngSeed() const;
+
+    void free(KMeans::Matrix::iterator begin, KMeans::Matrix::iterator end, double value);
+    double calculateDistance(const Vector& first, const Vector& second);
+    size_t chooseCluster(const Matrix& centroids, const Vector& point);
+    Matrix initCentroids(const Matrix& dataset);
+    ComputeResult compute(const Matrix& dataset, const size_t& setSize, const size_t& pointSize);
 public:
     KMeans(const size_t& clusters, const size_t& maxIterations);
-    void compute(const Dataset& dataset);
+
+    ComputeResult compute(const std::vector<std::vector<double>>& dataset);
 };
