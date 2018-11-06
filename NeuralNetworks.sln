@@ -11,7 +11,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MultilayerPerceptron", "Mul
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RBF", "RBF\RBF.vcxproj", "{C2098620-7847-4AB3-BACB-8EC4626F4901}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Kmeans", "Kmeans\Kmeans.vcxproj", "{B3451816-612E-45D0-833C-BC32889E989E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KMeans", "KMeans\Kmeans.vcxproj", "{B3451816-612E-45D0-833C-BC32889E989E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
