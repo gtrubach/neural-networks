@@ -92,7 +92,7 @@ matr createRandomMatrix(const size_t &n,
 
 int main()
 {
-    size_t n = 36, h = 2, m = 5, p = 5;
+    size_t n = 36, h = 5, m = 5, p = 5;
 
     matr inputs =
     {
@@ -159,7 +159,7 @@ int main()
     std::uniform_real_distribution<double> distr(-1.0, 1.0);
 
     double alpha;
-    alpha = 2.0;
+    alpha = 0.01;
     matr wHO = createRandomMatrix(h, m, rng, distr);
     matr ferr(p, vect(m));
 
@@ -198,7 +198,7 @@ int main()
         {
             auto centroid = centroids[j];
             double dist = calculateDistance(in, centroid);
-            rbfUnits[idx][j] = exp(-dist / (2 * widths[j] * widths[j]));
+            rbfUnits[idx][j] = exp(-dist / (widths[j]));
         }
     }
 
