@@ -61,7 +61,7 @@ KMeans::Matrix KMeans::initCentroids(const Matrix& dataset)
     return Matrix(begin, begin + clustersCount);
 }
 
-KMeans::ComputeResult KMeans::compute(const Matrix& dataset, const size_t& setSize, const size_t& pointSize)
+KMeans::ComputeResult KMeans::computeCore(const Matrix& dataset, const size_t& setSize, const size_t& pointSize)
 {
     size_t iteration = 0;
     bool converges = false;
@@ -119,17 +119,17 @@ KMeans::ComputeResult KMeans::compute(const std::vector<std::vector<double>>& da
     size_t setSize = dataset.size();
     if (dataset.size() < clustersCount)
     {
-        throw new std::invalid_argument("Set size should be not less than number of clusters.");
+        throw std::invalid_argument("Set size should be not less than number of clusters.");
     }
     size_t dataSize = dataset.begin()->size();
     for (const Vector& data : dataset)
     {
         if (dataSize != data.size())
         {
-            throw new std::invalid_argument("Data length in set must be the same.");
+            throw std::invalid_argument("Data length in set must be the same.");
         }
     }
-    return compute(dataset, setSize, dataSize);
+    return computeCore(dataset, setSize, dataSize);
 }
 
 KMeans::ComputeResult::ComputeResult(const std::vector<size_t>& labels, const std::vector<std::vector<double>>& centroids)

@@ -29,7 +29,7 @@ private:
     double calculateDistance(const Vector& first, const Vector& second);
     size_t chooseCluster(const Matrix& centroids, const Vector& point);
     Matrix initCentroids(const Matrix& dataset);
-    ComputeResult compute(const Matrix& dataset, const size_t& setSize, const size_t& pointSize);
+    ComputeResult computeCore(const Matrix& dataset, const size_t& setSize, const size_t& pointSize);
 public:
     KMeans(const size_t& clusters, const size_t& maxIterations);
 
