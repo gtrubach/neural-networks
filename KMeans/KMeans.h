@@ -25,7 +25,7 @@ private:
     std::mt19937 rng;
     unsigned int getRngSeed() const;
 
-    void free(KMeans::Matrix::iterator begin, KMeans::Matrix::iterator end, double value);
+    void fill(KMeans::Matrix::iterator begin, KMeans::Matrix::iterator end, double value);
     double calculateDistance(const Vector& first, const Vector& second);
     size_t chooseCluster(const Matrix& centroids, const Vector& point);
     Matrix initCentroids(const Matrix& dataset);

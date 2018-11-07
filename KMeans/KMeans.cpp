@@ -9,7 +9,7 @@ unsigned int KMeans::getRngSeed() const
         .count();
 }
 
-void KMeans::free(KMeans::Matrix::iterator begin, KMeans::Matrix::iterator end, double value)
+void KMeans::fill(KMeans::Matrix::iterator begin, KMeans::Matrix::iterator end, double value)
 {
     for (auto it = begin; it != end; ++it)
     {
@@ -73,7 +73,7 @@ KMeans::ComputeResult KMeans::computeCore(const Matrix& dataset, const size_t& s
     while (!converges && iteration < maxIterations)
     {
         std::fill(clustersSizes.begin(), clustersSizes.end(), 0);
-        free(newCentroids.begin(), newCentroids.end(), 0);
+        fill(newCentroids.begin(), newCentroids.end(), 0);
         for (size_t i = 0; i < setSize; i++)
         {
             const Vector& point = dataset[i];
