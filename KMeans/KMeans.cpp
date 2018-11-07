@@ -52,13 +52,13 @@ KMeans::Matrix KMeans::initCentroids(const Matrix& dataset)
     Matrix sample = dataset;
     size_t datasetSize = dataset.size();
     auto begin = sample.begin();
-    for (size_t i = 0; i < clustersCount; i++)
+    for (size_t i = 0; i < clustersCount - 1; i++)
     {
-        auto it = begin + rng() % datasetSize - i;
+        auto it = begin + rng() % (datasetSize - i);
         std::swap(*begin, *it);
         begin++;
     }
-    return Matrix(begin, begin + clustersCount);
+    return Matrix(sample.begin(), sample.begin() + clustersCount);
 }
 
 KMeans::ComputeResult KMeans::computeCore(const Matrix& dataset, const size_t& setSize, const size_t& pointSize)
