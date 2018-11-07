@@ -5,6 +5,8 @@
 #include <random>
 #include <chrono>
 
+#include <KMeans.h>
+
 using namespace std;
 
 using vect = vector<double>;
@@ -12,12 +14,28 @@ using matr = vector<vector<double>>;
 
 double activate(double value)
 {
-    return 1.0 / (1.0 + exp(-value));
+    if (value > 1.0)
+    {
+        return 1.0;
+    }
+    if (value < -1.0)
+    {
+        return -1.0;
+    }
+    return value;
 }
 
-double sigmoidDerivative(double value)
+double calculateDistance(const vect& first, const vect& second)
 {
-    return value * (1.0 - value);
+    double dist = 0.0;
+    auto firstIt = first.begin();
+    auto secondIt = second.begin();
+    for (; firstIt != first.end(); ++firstIt, ++secondIt)
+    {
+        double localDist = *firstIt - *secondIt;
+        dist += localDist * localDist;
+    }
+    return sqrt(dist);
 }
 
 vect createRandomVector(const size_t& size,
@@ -30,23 +48,6 @@ vect createRandomVector(const size_t& size,
         res[i] = distr(rng);
     }
     return res;
-}
-
-double getError(double ideal, double expected)
-{
-    return ideal - expected;
-}
-
-double max(vect arr)
-{
-    double tmp = arr[0];
-
-    for (auto el : arr)
-    {
-        if (el > tmp) tmp = el;
-    }
-
-    return tmp;
 }
 
 double maxAbs(matr m)
@@ -79,21 +80,19 @@ void DrawImage(vect &in)
 matr createRandomMatrix(const size_t &n,
     const size_t &h,
     default_random_engine& rng,
-    uniform_real_distribution<double>& distr);
-
-vect calcRBFLayer(const vect& input, const vect& centers, const vect& sds);
-
-void updateWeightsAndThresholds(const size_t &m,
-    const size_t &h,
-    const double &speed,
-    const vect &delta,
-    const vect &layer,
-    matr &weights,
-    vect &thresholds);
+    uniform_real_distribution<double>& distr)
+{
+    matr m(n, vect(h));
+    for (size_t i = 0; i < n; i++)
+    {
+        m[i] = createRandomVector(h, rng, distr);
+    }
+    return m;
+}
 
 int main()
 {
-    size_t n = 36, h = 18, m = 5, p = 5;
+    size_t n = 36, h = 2, m = 5, p = 5;
 
     matr inputs =
     {
@@ -152,38 +151,16 @@ int main()
         { 0.0, 0.0, 0.0, 0.0, 1.0 }
     };
 
-    vect hid(h);
+    matr rbfUnits(p, vect(h));
     matr outputsTrained(m, vect(m));
 
     auto seed = (unsigned int)std::chrono::high_resolution_clock::now().time_since_epoch().count();
     std::default_random_engine rng(seed);
     std::uniform_real_distribution<double> distr(-1.0, 1.0);
 
-    vect Q = createRandomVector(h, rng, distr);
-    vect T = createRandomVector(m, rng, distr);
-
-    double alpha, beta;
-    alpha = 2;
-    beta = 3;
-    matr wIH = createRandomMatrix(n, h, rng, distr);
-    /*for (size_t i = 0; i < n; i++)
-    {
-        for (size_t j = 0; j < h; j++)
-        {
-            cout << wIH[i][j] << ", ";
-        }
-        cout << '\n';
-    }
-    cout << '\n';*/
+    double alpha;
+    alpha = 2.0;
     matr wHO = createRandomMatrix(h, m, rng, distr);
-    /*for (size_t i = 0; i < h; i++)
-    {
-        for (size_t j = 0; j < m; j++)
-        {
-            cout << wHO[i][j] << ", ";
-        }
-        cout << '\n';
-    }*/
     matr ferr(p, vect(m));
 
     std::clock_t start;
@@ -191,52 +168,79 @@ int main()
 
     start = std::clock();
 
+    KMeans kMeans(h, 10);
+    auto kMeansResult = kMeans.compute(inputs);
+    auto centroids = kMeansResult.centroids;
+
+    vect widths(h);
+    for (size_t j = 0; j < h; j++)
+    {
+        auto& clusterCentroid = centroids[j];
+        double minDistance = std::numeric_limits<double>::max();
+        for (size_t l = 0; l < h; l++)
+        {
+            if (j != l)
+            {
+                double dist = calculateDistance(clusterCentroid, centroids[l]);
+                if (dist < minDistance)
+                {
+                    minDistance = dist;
+                }
+            }
+        }
+        widths[j] = minDistance * minDistance / 4.0;
+    }
+
+    for (size_t idx = 0; idx < p; idx++)
+    {
+        vect in = inputs[idx];
+        for (size_t j = 0; j < h; j++)
+        {
+            auto centroid = centroids[j];
+            double dist = calculateDistance(in, centroid);
+            rbfUnits[idx][j] = exp(-dist / (2 * widths[j] * widths[j]));
+        }
+    }
+
     size_t iter = 0;
     do
     {
         for (size_t idx = 0; idx < p; idx++)
         {
-            vect in = inputs[idx];
+            const vect& hid = rbfUnits[idx];
             vect out = outputsTrained[idx];
             vect outReal = outputs[idx];
 
-            for (size_t j = 0; j < h; j++)
+            for (size_t k = 0; k < m; k++)
             {
-
+                double tmp = 0.0;
+                for (size_t j = 0; j < h; j++)
+                {
+                    tmp += wHO[j][k] * hid[j];
+                }
+                out[k] = activate(tmp);
             }
 
-            hid = calcLayer(n, h, in, Q, wIH);
-            out = calcLayer(h, m, hid, T, wHO);
-
             vect err(m);
-            vect out_delta(m);
 
             for (size_t k = 0; k < m; k++)
             {
                 err[k] = outReal[k] - out[k];
                 ferr[idx][k] = err[k];
-                out_delta[k] = err[k] * sigmoidDerivative(out[k]);
             }
 
-            vect hid_err(h);
-            vect hid_delta(h);
-
-            for (size_t j = 0; j < h; j++)
+            for (size_t k = 0; k < m; k++)
             {
-                for (size_t k = 0; k < m; k++)
+                for (size_t j = 0; j < h; j++)
                 {
-                    hid_err[j] += out_delta[k] * wHO[j][k];
+                    wHO[j][k] += alpha * err[k] * hid[j];
                 }
-                hid_delta[j] = hid_err[j] * sigmoidDerivative(hid[j]);
             }
-
-            updateWeightsAndThresholds(m, h, alpha, out_delta, hid, wHO, T);
-            updateWeightsAndThresholds(h, n, beta, hid_delta, in, wIH, Q);
 
             outputsTrained[idx] = out;
         }
         iter++;
-    } while (maxAbs(ferr) >= 0.01);
+    } while (maxAbs(ferr) >= 0.0001);
 
     duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
     std::cout << "=============\n";
@@ -277,19 +281,17 @@ int main()
         }
     }
 
-    for (auto in_noised : ins_noised)
+    for(auto& in_noised: ins_noised)
     {
         DrawImage(in_noised);
         vect out_rec(m);
 
-        for (size_t i = 0; i < h; i++)
+        vect hid(h);
+        for (size_t j = 0; j < h; j++)
         {
-            double tmp = 0.0;
-            for (size_t j = 0; j < n; j++)
-            {
-                tmp += wIH[j][i] * in_noised[j];
-            }
-            hid[i] = activate(tmp + Q[i]);
+            auto centroid = centroids[j];
+            double dist = calculateDistance(in_noised, centroid);
+            hid[j] = exp(-dist / (2 * widths[j] * widths[j]));
         }
 
         for (size_t k = 0; k < m; k++)
@@ -299,7 +301,7 @@ int main()
             {
                 tmp += wHO[j][k] * hid[j];
             }
-            out_rec[k] = activate(tmp + T[k]);
+            out_rec[k] = activate(tmp);
         }
 
         for (size_t k = 0; k < m; k++)
@@ -309,42 +311,4 @@ int main()
     }
 
     return 0;
-}
-
-void updateWeightsAndThresholds(const size_t &m,
-    const size_t &h,
-    const double &speed,
-    const vect &delta,
-    const vect &layer,
-    matr &weights,
-    vect &thresholds)
-{
-    for (size_t k = 0; k < m; k++)
-    {
-        for (size_t j = 0; j < h; j++)
-        {
-            weights[j][k] += speed * delta[k] * layer[j];
-        }
-        thresholds[k] += speed * delta[k];
-    }
-}
-
-
-
-matr createRandomMatrix(const size_t &n,
-    const size_t &h,
-    default_random_engine& rng,
-    uniform_real_distribution<double>& distr)
-{
-    matr m(n, vect(h));
-    for (size_t i = 0; i < n; i++)
-    {
-        m[i] = createRandomVector(h, rng, distr);
-    }
-    return m;
-}
-
-vect calcRBFLayer(const vect &input, const vect &centers, const vect &sds)
-{
-    vect output
 }
