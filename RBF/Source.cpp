@@ -159,7 +159,7 @@ int main()
     std::uniform_real_distribution<double> distr(-1.0, 1.0);
 
     double alpha;
-    alpha = 0.01;
+    alpha = 1.0;
     matr wHO = createRandomMatrix(h, m, rng, distr);
     matr ferr(p, vect(m));
 
@@ -188,7 +188,8 @@ int main()
                 }
             }
         }
-        widths[j] = minDistance * minDistance / 4.0;
+        widths[j] = minDistance / 2.0;
+        widths[j] *= widths[j];
     }
 
     for (size_t idx = 0; idx < p; idx++)
@@ -257,7 +258,7 @@ int main()
     std::cout << "Elapsed: " << duration << " sec.\n";
     std::cout << "=============\n";
 
-    matr ins_noised;
+    matr ins_noised = inputs;
 
     std::vector<size_t> idxs(n);
     for (size_t i = 0; i < n; i++)
@@ -281,7 +282,7 @@ int main()
         }
     }
 
-    for(auto& in_noised: ins_noised)
+    for (auto& in_noised : ins_noised)
     {
         DrawImage(in_noised);
         vect out_rec(m);
@@ -291,7 +292,7 @@ int main()
         {
             auto centroid = centroids[j];
             double dist = calculateDistance(in_noised, centroid);
-            hid[j] = exp(-dist / (2 * widths[j] * widths[j]));
+            hid[j] = exp(-dist / (widths[j]));
         }
 
         for (size_t k = 0; k < m; k++)
