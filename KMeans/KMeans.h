@@ -17,8 +17,6 @@ private:
     using Vector = std::vector<double>;
     using Matrix = std::vector<Vector>;
 
-    struct ComputeResult;
-
     size_t clustersCount;
     size_t maxIterations;
 
