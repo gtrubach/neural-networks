@@ -14,6 +14,7 @@ private:
     std::default_random_engine rng;
 
     unsigned int getRngSeed() const;
+    std::vector<size_t> getTrainOrder(const size_t& setSize) const;
     size_t getWinner(const std::vector<double>& input) const;
 public:
     struct TrainParams

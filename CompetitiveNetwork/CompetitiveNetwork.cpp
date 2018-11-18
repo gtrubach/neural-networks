@@ -9,6 +9,17 @@ unsigned int CompetitiveNetwork::getRngSeed() const
         .count();
 }
 
+std::vector<size_t> CompetitiveNetwork::getTrainOrder(const size_t& setSize) const
+{
+    std::vector<size_t> trainOrder;
+    trainOrder.reserve(setSize);
+    for (size_t i = 0; i < setSize; i++)
+    {
+        trainOrder.push_back(i);
+    }
+    return trainOrder;
+}
+
 size_t CompetitiveNetwork::getWinner(const std::vector<double>& input) const
 {
     double minDistortion = std::numeric_limits<double>::max();
@@ -66,13 +77,16 @@ void CompetitiveNetwork::train(const std::vector<std::vector<double>>& dataset, 
             throw std::invalid_argument("Wrong input size.");
         }
     }
+    std::vector<size_t> trainOrder = getTrainOrder(dataset.size());
     size_t iteration = 0;
     double converges = false;
     while (!converges)
     {
+        std::shuffle(trainOrder.begin(), trainOrder.end(), rng);
         double maxDistance = 0.0;
-        for (const auto& data : dataset)
+        for (size_t dataIdx : trainOrder)
         {
+            const auto& data = dataset[dataIdx];
             size_t winner = getWinner(data);
             wins[winner]++;
             double len = 0.0;
