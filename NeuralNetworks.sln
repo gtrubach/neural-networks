@@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.28010.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hopfield", "Hopfield\Hopfield.vcxproj", "{D79CF052-DDD4-4C6A-A7AF-DF24D065FBC8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HopfieldGUI", "HopfieldGUI\HopfieldGUI.vcxproj", "{7DC9DF8D-2698-47F1-B415-EC85F34D662F}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MultilayerPerceptron", "MultilayerPerceptron\MultilayerPerceptron.vcxproj", "{D5319A39-DF3D-4F41-8AB4-2C7DCB47F93D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RBF", "RBF\RBF.vcxproj", "{C2098620-7847-4AB3-BACB-8EC4626F4901}"
@@ -14,6 +12,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KMeans", "KMeans\KMeans.vcxproj", "{6556268D-8F89-40D2-BE01-BB6E0DF89FB2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KMeans.Test", "KMeans.Test\KMeans.Test.vcxproj", "{409F6B52-95E0-42F7-9C5E-7FB3A8D47307}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CompetitiveNetwork", "CompetitiveNetwork\CompetitiveNetwork.vcxproj", "{5E53CA25-D38F-4FD2-B875-610C72261BB0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,14 +31,6 @@ Global
 		{D79CF052-DDD4-4C6A-A7AF-DF24D065FBC8}.Release|x64.Build.0 = Release|x64
 		{D79CF052-DDD4-4C6A-A7AF-DF24D065FBC8}.Release|x86.ActiveCfg = Release|Win32
 		{D79CF052-DDD4-4C6A-A7AF-DF24D065FBC8}.Release|x86.Build.0 = Release|Win32
-		{7DC9DF8D-2698-47F1-B415-EC85F34D662F}.Debug|x64.ActiveCfg = Debug|x64
-		{7DC9DF8D-2698-47F1-B415-EC85F34D662F}.Debug|x64.Build.0 = Debug|x64
-		{7DC9DF8D-2698-47F1-B415-EC85F34D662F}.Debug|x86.ActiveCfg = Debug|Win32
-		{7DC9DF8D-2698-47F1-B415-EC85F34D662F}.Debug|x86.Build.0 = Debug|Win32
-		{7DC9DF8D-2698-47F1-B415-EC85F34D662F}.Release|x64.ActiveCfg = Release|x64
-		{7DC9DF8D-2698-47F1-B415-EC85F34D662F}.Release|x64.Build.0 = Release|x64
-		{7DC9DF8D-2698-47F1-B415-EC85F34D662F}.Release|x86.ActiveCfg = Release|Win32
-		{7DC9DF8D-2698-47F1-B415-EC85F34D662F}.Release|x86.Build.0 = Release|Win32
 		{D5319A39-DF3D-4F41-8AB4-2C7DCB47F93D}.Debug|x64.ActiveCfg = Debug|x64
 		{D5319A39-DF3D-4F41-8AB4-2C7DCB47F93D}.Debug|x64.Build.0 = Debug|x64
 		{D5319A39-DF3D-4F41-8AB4-2C7DCB47F93D}.Debug|x86.ActiveCfg = Debug|Win32
@@ -71,6 +63,14 @@ Global
 		{409F6B52-95E0-42F7-9C5E-7FB3A8D47307}.Release|x64.Build.0 = Release|x64
 		{409F6B52-95E0-42F7-9C5E-7FB3A8D47307}.Release|x86.ActiveCfg = Release|Win32
 		{409F6B52-95E0-42F7-9C5E-7FB3A8D47307}.Release|x86.Build.0 = Release|Win32
+		{5E53CA25-D38F-4FD2-B875-610C72261BB0}.Debug|x64.ActiveCfg = Debug|x64
+		{5E53CA25-D38F-4FD2-B875-610C72261BB0}.Debug|x64.Build.0 = Debug|x64
+		{5E53CA25-D38F-4FD2-B875-610C72261BB0}.Debug|x86.ActiveCfg = Debug|Win32
+		{5E53CA25-D38F-4FD2-B875-610C72261BB0}.Debug|x86.Build.0 = Debug|Win32
+		{5E53CA25-D38F-4FD2-B875-610C72261BB0}.Release|x64.ActiveCfg = Release|x64
+		{5E53CA25-D38F-4FD2-B875-610C72261BB0}.Release|x64.Build.0 = Release|x64
+		{5E53CA25-D38F-4FD2-B875-610C72261BB0}.Release|x86.ActiveCfg = Release|Win32
+		{5E53CA25-D38F-4FD2-B875-610C72261BB0}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
