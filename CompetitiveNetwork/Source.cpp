@@ -1,4 +1,6 @@
 ﻿#include <iostream>
+#include <fstream>
+#include "libs/nlohmann/json.hpp"
 #include "CompetitiveNetwork.h"
 
 using vect = std::vector<double>;
@@ -14,7 +16,7 @@ double length(const vect& v)
     return sqrt(result);
 }
 
-void DrawImage(const vect &in)
+void drawImage(const vect &in)
 {
     int counter = 0;
     for (auto e : in)
@@ -25,68 +27,41 @@ void DrawImage(const vect &in)
     }
 }
 
-int main()
+void readData(const char* path, matr &trainData, size_t &clusters)
 {
-    size_t n = 36, m = 5;
-
-    matr inputs =
+    clusters = 0;
+    nlohmann::json j;
+    std::ifstream in(path);
+    in >> j;
+    in.close();
+    for (const auto& obj : j)
     {
-        // ^
-        {
-            0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
-            0.0, 1.0, 0.0, 1.0, 0.0, 0.0,
-            0.0, 1.0, 0.0, 1.0, 0.0, 0.0,
-            1.0, 0.0, 0.0, 0.0, 1.0, 0.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-        },
-        // ˅
-        {
-            1.0, 0.0, 0.0, 0.0, 1.0, 0.0,
-            0.0, 1.0, 0.0, 1.0, 0.0, 0.0,
-            0.0, 1.0, 0.0, 1.0, 0.0, 0.0,
-            0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-        },
-        // ꓱ
-        {
-            1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
-            1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
-            1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-        },
-        // ⊂
-        {
-            0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-            1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-            1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-            0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-        },
-        // ⊃
-        {
-            1.0, 1.0, 1.0, 1.0, 1.0, 0.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
-            1.0, 1.0, 1.0, 1.0, 1.0, 0.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-        }
-    };
+        clusters++;
+        matr data = obj["Data"];
+        trainData.insert(trainData.end(), data.begin(), data.end());
+    }
+}
 
-    matr normedInputs = inputs;
-    for (vect& x : normedInputs)
+void normalizeSet(matr::iterator begin, matr::iterator end, const size_t &n)
+{
+    for (auto it = begin; it != end; ++it)
     {
+        auto &x = *it;
         double len = length(x);
         for (size_t i = 0; i < n; i++)
         {
             x[i] /= len;
         }
     }
+}
+
+int main()
+{
+    size_t n = 36, m;
+    matr trainData;
+    readData("data/traindata.json", trainData, m);
+
+    normalizeSet(trainData.begin(), trainData.end(), n);
 
     CompetitiveNetwork::TrainParams trainParams;
     trainParams.speed = 0.01;
@@ -94,11 +69,23 @@ int main()
     trainParams.maxIteration = 1000;
 
     CompetitiveNetwork network(n, m);
-    network.train(normedInputs, trainParams);
+    network.train(trainData, trainParams);
 
-    for (const auto& x : normedInputs)
+    for (const auto& x : trainData)
     {
-        DrawImage(x);
+        drawImage(x);
+        size_t cluster = network.predict(x);
+        std::cout << cluster << '\n';
+    }
+
+    size_t testCount;
+    matr testData;
+    readData("data/testdata.json", testData, testCount);
+    normalizeSet(testData.begin(), testData.end(), n);
+
+    for (const auto& x : testData)
+    {
+        drawImage(x);
         size_t cluster = network.predict(x);
         std::cout << cluster << '\n';
     }
