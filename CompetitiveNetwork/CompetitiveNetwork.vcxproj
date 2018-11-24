@@ -19,11 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CompetitiveNetwork.cpp" />
-    <ClCompile Include="Source.cpp" />
+    <ClCompile Include="src\CompetitiveNetwork.cpp" />
+    <ClCompile Include="src\Source.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CompetitiveNetwork.h" />
+    <ClInclude Include="src\CompetitiveNetwork.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

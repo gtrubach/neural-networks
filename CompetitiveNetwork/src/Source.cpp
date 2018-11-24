@@ -1,6 +1,6 @@
 ﻿#include <iostream>
 #include <fstream>
-#include "libs/nlohmann/json.hpp"
+#include "../libs/nlohmann/json.hpp"
 #include "CompetitiveNetwork.h"
 
 using vect = std::vector<double>;
