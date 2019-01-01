@@ -19,18 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Layer.h" />
-    <ClInclude Include="MLP.h" />
-    <ClInclude Include="MLPInfo.h" />
-    <ClInclude Include="Synapse.h" />
-    <ClInclude Include="TrainConfig.h" />
-    <ClInclude Include="TrainingSample.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Layer.cpp" />
-    <ClCompile Include="MLP.cpp" />
     <ClCompile Include="Source.cpp" />
-    <ClCompile Include="Synapse.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

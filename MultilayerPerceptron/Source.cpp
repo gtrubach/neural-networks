@@ -5,8 +5,6 @@
 #include <random>
 #include <chrono>
 
-#include "MLP.h"
-
 using namespace std;
 
 using vect = vector<double>;
@@ -101,8 +99,6 @@ int main()
 {
     size_t n = 36, h = 18, m = 5, p = 5;
 
-    /*std::vector<TrainingSample> sample;
-    sample.reserve(p);*/
     matr inputs =
     {
         // ^
@@ -160,14 +156,6 @@ int main()
         { 0.0, 0.0, 0.0, 0.0, 1.0 }
     };
 
-    /*for (size_t i = 0; i < p; i++)
-    {
-        sample.push_back(TrainingSample(inputs[i], outputs[i]));
-    }
-
-    MLP mlp({ n,h,m });
-    mlp.train(sample, TrainConfig());*/
-
     vect hid(h);
     matr outputsTrained(m, vect(m));
 
@@ -182,24 +170,7 @@ int main()
     alpha = 2;
     beta = 3;
     matr wIH = createRandomMatrix(n, h, rng, distr);
-    /*for (size_t i = 0; i < n; i++)
-    {
-        for (size_t j = 0; j < h; j++)
-        {
-            cout << wIH[i][j] << ", ";
-        }
-        cout << '\n';
-    }
-    cout << '\n';*/
     matr wHO = createRandomMatrix(h, m, rng, distr);
-    /*for (size_t i = 0; i < h; i++)
-    {
-        for (size_t j = 0; j < m; j++)
-        {
-            cout << wHO[i][j] << ", ";
-        }
-        cout << '\n';
-    }*/
     matr ferr(p, vect(m));
 
     std::clock_t start;
@@ -249,7 +220,7 @@ int main()
         iter++;
     } while (maxAbs(ferr) >= 0.01);
 
-    duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+    duration = ((double)std::clock() - start) / (double)CLOCKS_PER_SEC;
     std::cout << "=============\n";
     std::cout << "Train stats:\n";
     for (size_t i = 0; i < p; i++)
